@@ -50,9 +50,9 @@ class CustomArchiveDesktop {
 
     String contentFile1 = _fileModule(name);
     String contentFile2 = _models(nameModule);
-    String contentFile3 = _models(nameModule);
-    String contentFile4 = _models(nameModule);
-    String contentFile5 = _models(nameModule);
+    String contentFile3 = _provider(nameModule);
+    String contentFile4 = _repositories(nameModule);
+    String contentFile5 = _useCases(nameModule);
 
     if (selectedDirectory != null) {
       // Definir contenido de los archivos
