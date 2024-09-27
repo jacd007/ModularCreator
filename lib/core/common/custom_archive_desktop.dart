@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
@@ -36,7 +37,7 @@ class CustomArchiveDesktop {
   // DESKTOP MODE
 
   static Future<bool> selectDirectoryAndCreateZip(
-      {required String nameModule}) async {
+      {required String nameModule, String contentModel = ''}) async {
     final name = nameModule.toLowerCase();
 
     final dirFile1 = '$name/$name';
@@ -49,7 +50,7 @@ class CustomArchiveDesktop {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
 
     String contentFile1 = _fileModule(name);
-    String contentFile2 = _models(nameModule);
+    String contentFile2 = _models(nameModule, contentModel: contentModel);
     String contentFile3 = _provider(nameModule);
     String contentFile4 = _repositories(nameModule);
     String contentFile5 = _useCases(nameModule);
@@ -158,23 +159,22 @@ export "$d5${name}_use_cases.dart";
 }
 
 // models
-String _models(String name) {
-  return '''
-
-class ${name}Model {
-  /// constructor
-  ${name}Model();
-
-  /// fromJson
-  static ${name}Model fromJson(Map<String, dynamic> json) {
-    return ${name}Model();
+String _models(String name, {String contentModel = ''}) {
+  Map<String, dynamic> map = {
+    "id": 0,
+    "name": "",
+    "doubles": 0.99,
+    "show": false,
+    "maps": {},
+    "lists": ["Type ", "Sample"]
+  };
+  try {
+    map = contentModel.isEmpty ? map : jsonDecode(contentModel);
+  } on Exception catch (e) {
+    debugPrint('Error _model parse: $e');
   }
 
-  Map<String, dynamic> toJson() => {};
-}
-
-
-''';
+  return generateModel(className: name, fields: map);
 }
 
 // provider
@@ -384,4 +384,154 @@ abstract class ${name}RepositoryUseCases {
 }
 
 ''';
+}
+
+// ===========================================================================
+String generateModel(
+    {required String className, required Map<String, dynamic> fields}) {
+  StringBuffer sb = StringBuffer();
+
+  // Class header
+  sb.writeln('class ${className}Model {');
+
+  // Final variables definition
+  fields.forEach((key, value) {
+    String type = _inferType(value);
+    final newKey = _convertSnakeToCamel(key);
+    sb.writeln('  final $type $newKey;');
+  });
+
+  // Constructor
+  sb.writeln('\n  ${className}Model({');
+  fields.forEach((key, value) {
+    // String type = _inferType(value);
+    final newKey = _convertSnakeToCamel(key);
+    sb.writeln('    required this.$newKey,');
+  });
+  sb.writeln('  });');
+
+  // copyWith method
+  sb.writeln('\n  ${className}Model copyWith({');
+  fields.forEach((key, value) {
+    String type = _inferType(value);
+    final newKey = _convertSnakeToCamel(key);
+    sb.writeln('    $type? $newKey,');
+  });
+  sb.writeln('  }) {');
+  sb.writeln('    return ${className}Model(');
+  fields.forEach((key, value) {
+    final newKey = _convertSnakeToCamel(key);
+    sb.writeln('      $newKey: $newKey ?? this.$newKey,');
+  });
+  sb.writeln('    );');
+  sb.writeln('  }');
+
+  // fromJson method
+  sb.writeln(
+      '\n  factory ${className}Model.fromJson(Map<String, dynamic> json) {');
+  sb.writeln('    return ${className}Model(');
+  fields.forEach((key, value) {
+    String type = _inferType(value, isNullable: true);
+    final newKey = _convertSnakeToCamel(key);
+    String defaultValue = _typeDefault(type);
+
+    // nameVar: json['name_var'] as String? ?? '',
+    // sb.writeln('      $newKey: json[\'$key\'] as $type ?? $defaultValue,');
+
+    // nameVar: json['name_var'] ?? '',
+    sb.writeln('      $newKey: json[\'$key\'] ?? $defaultValue,');
+  });
+  sb.writeln('    );');
+  sb.writeln('  }');
+
+  // toJson method
+  sb.writeln('\n  Map<String, dynamic> toJson() {');
+  sb.writeln('    return {');
+  fields.forEach((key, value) {
+    final newKey = _convertSnakeToCamel(key);
+    sb.writeln('      \'$key\': $newKey,');
+  });
+  sb.writeln('    };');
+  sb.writeln('  }');
+
+  // 'empty' factory method with non-null parameters and default values
+  sb.writeln('\n  factory ${className}Model.empty({');
+
+  fields.forEach((key, value) {
+    String type = _inferType(value);
+    final newKey = _convertSnakeToCamel(key);
+
+    String defaultValue = _typeDefault(type);
+
+    sb.writeln('    $type $newKey = $defaultValue,');
+  });
+
+  sb.writeln('}) {');
+
+  // Return constructor with default values
+  sb.writeln('    return ${className}Model(');
+
+  fields.forEach((key, value) {
+    final newKey = _convertSnakeToCamel(key);
+    sb.writeln('      $newKey: $newKey,');
+  });
+
+  sb.writeln('    );');
+  sb.writeln('}');
+
+  // Class closure
+  sb.writeln('}');
+
+  return sb.toString();
+}
+
+// Function to infer the type from the value
+String _inferType(dynamic value, {bool isNullable = false}) {
+  String type = 'Object';
+  if (value is String) type = 'String';
+  if (value is int) type = 'int';
+  if (value is double) type = 'double';
+  if (value is bool) type = 'bool';
+
+  if (value is List) type = 'List';
+
+  if (value is Map) type = 'Map<String, dynamic>';
+
+  return isNullable ? '$type?' : type;
+}
+
+String _typeDefault(String type) {
+  type = type.replaceAll("?", "");
+  String defaultValue;
+
+  if (type == 'String') {
+    defaultValue = '\'\'';
+  } else if (type == 'int') {
+    defaultValue = '0';
+  } else if (type == 'double') {
+    defaultValue = '0.0';
+  } else if (type == 'bool') {
+    defaultValue = 'false';
+  } else if (type == 'List') {
+    defaultValue = '[]';
+  } else if (type == 'Map') {
+    defaultValue = '{}';
+  } else {
+    defaultValue = 'null';
+  }
+  return defaultValue;
+}
+
+String _convertSnakeToCamel(String input) {
+  // Dividir el string por el guion bajo
+  List<String> parts = input.split('_');
+
+  // Convertir la primera parte a minúsculas y las siguientes a mayúsculas
+  String result = parts[0].toLowerCase() +
+      parts.skip(1).map((word) {
+        if (word.isEmpty) return '';
+        return word[0].toUpperCase() + word.substring(1);
+      }).join('');
+
+  return result;
 }
