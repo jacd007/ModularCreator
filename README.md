@@ -7,4 +7,4 @@ A new Flutter project.
 This project is a starting point for a Flutter application.
 
 USE
-[linux executable](https://github.com/jacd007/ModularCreator/blob/main/ModularCreator.zip)
+![linux executable](https://github.com/jacd007/ModularCreator/blob/main/ModularCreator.zip)
