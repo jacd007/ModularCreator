@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
     inputCtr.text = jsonEncode({
       "id": 0,
       "text": "",
-      "doubles": 12.65,
+      "price": 12.65,
       "show": false,
       "maps": {},
       "lists": ["Type ", "Sample"]
@@ -55,17 +55,19 @@ class _HomePageState extends State<HomePage> {
                 color: theme.primaryColor,
                 child: TextField(
                   controller: nameClassCtr,
+                  autofocus: true,
+                  cursorColor: Colors.red,
                   style: const TextStyle(color: Colors.white),
                   textAlignVertical: const TextAlignVertical(y: 0),
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                       hintText: 'ClassName',
-                      hintStyle: const TextStyle(color: Colors.grey),
+                      hintStyle: TextStyle(color: Colors.grey),
                       prefixIcon: SizedBox(
                         width: 40.0,
                         child: Center(
                           child: Icon(
                             Icons.class_,
-                            color: theme.iconTheme.color,
+                            color: Colors.grey,
                           ),
                         ),
                       ),
@@ -99,16 +101,21 @@ class _HomePageState extends State<HomePage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // INPUT TEXT
                 Expanded(
+                  flex: 2,
                   child: Stack(children: [
                     TextField(
                       controller: inputCtr,
-                      minLines: 100,
-                      maxLines: 10000,
+                      minLines: 50,
+                      maxLines: 1000,
+                      cursorColor: Colors.red,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.grey.shade200,
                         border: const OutlineInputBorder(),
+                        contentPadding:
+                            const EdgeInsets.fromLTRB(12, 80, 12, 12),
                       ),
                       onChanged: (content) => onChanged(
                         nameClass: convertSnakeToCamel(nameClassCtr.text),
@@ -117,71 +124,132 @@ class _HomePageState extends State<HomePage> {
                     ),
                     // copy and paste
                     Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        // copy
-                        Visibility(
-                          visible: inputCtr.text.trim().isNotEmpty,
+                      top: 2,
+                      right: 2,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          // name class
+                          Text(
+                            '${nameClassCtr.text}Model',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(width: 10),
+                          // copy
+                          Visibility(
+                            visible: inputCtr.text.trim().isNotEmpty,
+                            child: IconButton(
+                              tooltip: 'Copiar',
+                              onPressed: () {
+                                inputCtr.selection = TextSelection(
+                                  baseOffset: 0,
+                                  extentOffset: inputCtr.text.length,
+                                );
+                                copyToClipboard(outputCtr.text, context);
+                              },
+                              icon: const Icon(Icons.copy),
+                            ),
+                          ),
+                          // paste
+                          IconButton(
+                            tooltip: 'Pegar',
+                            onPressed: () {
+                              pasteFromClipboard().then((value) {
+                                if (value == null) return;
+
+                                setState(() {
+                                  inputCtr.text = value;
+                                });
+
+                                onChanged(
+                                  nameClass:
+                                      convertSnakeToCamel(nameClassCtr.text),
+                                  content: inputCtr.text,
+                                );
+                              });
+                            },
+                            icon: const Icon(Icons.paste),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  ]),
+                ),
+                const SizedBox(width: 20),
+                // OUTPUT TEXT
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: theme.iconTheme.color ?? Colors.black,
+                      ),
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    child: Stack(children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 45, 12, 12),
+                        child: HighlightableText(
+                          text: outputCtr.text.isEmpty
+                              ? 'Not Valido'
+                              : outputCtr.text,
+                          wordsToHighlight: [
+                            '${nameClassCtr.text.trim()}Model',
+                          ],
+                          secondaryWordsToHighlight: [
+                            ...HighlightableText.privateTypes,
+                          ],
+                          tertiaryWordsToHighlight: [
+                            'copyWith',
+                            'fromJson',
+                            'toJson',
+                            'fromMap',
+                            'toMap',
+                            'empty'
+                          ],
+                        ),
+                      ),
+                      /*  TextField(
+                        controller: outputCtr,
+                        minLines: 50,
+                        maxLines: 100000,
+                        readOnly: true,
+                        cursorColor: Colors.red,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
+                          border: const OutlineInputBorder(),
+                          contentPadding:
+                              const EdgeInsets.fromLTRB(12, 80, 12, 12),
+                        ),
+                      ), */
+                      // copy
+                      Positioned(
+                        top: 2,
+                        right: 2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
                           child: IconButton(
                             tooltip: 'Copiar',
                             onPressed: () {
+                              outputCtr.selection = TextSelection(
+                                baseOffset: 0,
+                                extentOffset: outputCtr.text.length,
+                              );
                               copyToClipboard(outputCtr.text, context);
                             },
                             icon: const Icon(Icons.copy),
                           ),
                         ),
-                        // paste
-                        IconButton(
-                          tooltip: 'Pegar',
-                          onPressed: () {
-                            pasteFromClipboard().then((value) {
-                              if (value == null) return;
-
-                              setState(() {
-                                inputCtr.text = value;
-                              });
-
-                              onChanged(
-                                nameClass:
-                                    convertSnakeToCamel(nameClassCtr.text),
-                                content: inputCtr.text,
-                              );
-                            });
-                          },
-                          icon: const Icon(Icons.paste),
-                        ),
-                      ]),
-                    ),
-                  ]),
-                ),
-                const SizedBox(width: 30),
-                Expanded(
-                  child: Stack(children: [
-                    TextField(
-                      controller: outputCtr,
-                      minLines: 100,
-                      maxLines: 10000,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey.shade100,
-                        border: const OutlineInputBorder(),
                       ),
-                    ),
-                    // copy
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
-                        tooltip: 'Copiar',
-                        onPressed: () {
-                          copyToClipboard(outputCtr.text, context);
-                        },
-                        icon: const Icon(Icons.copy),
-                      ),
-                    ),
-                  ]),
+                    ]),
+                  ),
                 ),
               ],
             ),
@@ -205,22 +273,22 @@ class _HomePageState extends State<HomePage> {
 
     setState(() => text = 'Construyendo ZIP');
     String name = nameClassCtr.text;
-    // name to capitalice
-    // TODO: here code
+
     if (kIsWeb) {
       throw Exception('Web not supported');
-    } else {
-      zip = await CustomArchiveDesktop.selectDirectoryAndCreateZip(
-        nameModule: name,
-        contentModel: inputCtr.text,
-      );
-      setState(() {
-        text = zip ? 'ZIP Creado Correctamente' : 'ZIP no Creado';
-      });
-      Future.delayed(const Duration(seconds: 3), () {
-        setState(() => text = '');
-      });
     }
+
+    zip = await CustomArchiveDesktop.createZip(
+      nameModule: name,
+      contentModel: inputCtr.text,
+    );
+    setState(() {
+      text = zip ? 'ZIP Creado Correctamente' : 'ZIP no Creado';
+    });
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() => text = '');
+    });
+
     if (zip) nameClassCtr.clear();
   }
 
@@ -247,8 +315,8 @@ class _HomePageState extends State<HomePage> {
       debugPrint('Error: $e');
     }
 
-    outputCtr.text = generateModel(
-      className: nameClass,
+    outputCtr.text = HelperArchiveModel.create(
+      name: nameClass,
       fields: fields,
     );
     setState(() {});
