@@ -13,7 +13,7 @@ class ${name}Provider extends ${name}UseCases {
 
   @override
   Future<ApiRestResponse> get$name([String id$name = '']) async {
-    final token = await SharedPrefs.getString('shared_JWT');
+    final token = await SharedPrefs.getString(shared_JWT);
 
     _apiRest
       ..endpoint = '\${Endpoint.${name.toLowerCase()}}/\$id$name'
@@ -27,7 +27,7 @@ class ${name}Provider extends ${name}UseCases {
 
   @override
   Future<ApiRestResponse> post$name(Map<String, dynamic> ${name.toLowerCase()}) async {
-    final token = await SharedPrefs.getString('shared_JWT');
+    final token = await SharedPrefs.getString(shared_JWT);
 
     _apiRest
       ..endpoint = Endpoint.${name.toLowerCase()}
@@ -42,7 +42,7 @@ class ${name}Provider extends ${name}UseCases {
   @override
   Future<ApiRestResponse> put$name(
       String id$name, Map<String, dynamic> ${name.toLowerCase()}) async {
-    final token = await SharedPrefs.getString('shared_JWT');
+    final token = await SharedPrefs.getString(shared_JWT);
 
     _apiRest
       ..endpoint = '\${Endpoint.${name.toLowerCase()}}/\$id$name'
@@ -58,7 +58,7 @@ class ${name}Provider extends ${name}UseCases {
 
   @override
   Future<ApiRestResponse> delete$name(String id$name) async {
-    final token = await SharedPrefs.getString('shared_JWT');
+    final token = await SharedPrefs.getString(shared_JWT);
 
     _apiRest
       ..endpoint = '\${Endpoint.${name.toLowerCase()}}/\$id$name'

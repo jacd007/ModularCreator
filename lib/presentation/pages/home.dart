@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
-import 'core/core_m.dart';
+import '../../core/core_m.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

@@ -1,7 +1,8 @@
 class HelperArchiveUseCases {
   HelperArchiveUseCases._();
 
-  static String create(String name) {
+  static String create(String name,
+      {List<Map<String, dynamic>> listMethods = const []}) {
     StringBuffer sb = StringBuffer();
 
     sb.writeln("\n");
