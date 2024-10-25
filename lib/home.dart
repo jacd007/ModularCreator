@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                           secondaryWordsToHighlight: [
                             ...HighlightableText.privateTypes,
                           ],
-                          tertiaryWordsToHighlight: [
+                          tertiaryWordsToHighlight: const [
                             'copyWith',
                             'fromJson',
                             'toJson',
