@@ -64,7 +64,7 @@ class HomeStepsPage extends StatelessWidget {
 
               return FloatingActionButton(
                 heroTag: 'btnHomeStepsPageViewFinished',
-                onPressed: zip ? null : () {},
+                onPressed: zip ? null : homeCtr.onCreateZip,
                 child: zip ? iconLoading : const Icon(Icons.build),
               );
             });

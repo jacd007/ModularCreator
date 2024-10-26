@@ -9,6 +9,7 @@ class HomeStep3Screen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeController>(builder: (homeCtr) {
+      homeCtr.updateStep3();
       return Scaffold(
         body: SafeArea(
           child: SingleChildScrollView(
@@ -21,22 +22,23 @@ class HomeStep3Screen extends StatelessWidget {
               const Divider(color: Colors.transparent),
               const Divider(),
               // list useCase provider
-              ...homeCtr.listMethods.map((method) {
-                return ResponsiveWidget(
+              for (int i = 0; i < homeCtr.listMethods.length; i++)
+                ResponsiveWidget(
                   desktopScreen: _item(
-                    name: method.name,
-                    returnT: method.return1,
-                    params: method.params1,
-                    content: method.content,
+                    index: i,
+                    name: homeCtr.listMethods[i].name,
+                    returnT: homeCtr.listMethods[i].return1,
+                    params: homeCtr.listMethods[i].params1,
+                    content: homeCtr.listMethods[i].content,
                   ),
                   mobileScreen: _itemMobile(
-                    name: method.name,
-                    returnT: method.return1,
-                    params: method.params1,
-                    content: method.content,
+                    index: i,
+                    name: homeCtr.listMethods[i].name,
+                    returnT: homeCtr.listMethods[i].return1,
+                    params: homeCtr.listMethods[i].params1,
+                    content: homeCtr.listMethods[i].content,
                   ),
-                );
-              }),
+                ),
               // title useCase repositories
               /*  const Divider(color: Colors.transparent),
               const Text('Repositories Use Cases'),
@@ -68,12 +70,14 @@ class HomeStep3Screen extends StatelessWidget {
   }
 
   Widget _item({
+    required int index,
     required String name,
     required String returnT,
     required String params,
     required String content,
   }) {
     final method1 = 'Future<$returnT> $name($params);';
+    final homeCtr = Get.find<HomeController>();
 
     return Column(mainAxisSize: MainAxisSize.min, children: [
       // item
@@ -86,7 +90,7 @@ class HomeStep3Screen extends StatelessWidget {
           content,
           style: const TextStyle(color: Colors.grey),
         ),
-        onLongPress: () {},
+        onLongPress: () => homeCtr.deleteMethod(index),
       ),
       // divider
       const Divider(),
@@ -94,27 +98,33 @@ class HomeStep3Screen extends StatelessWidget {
   }
 
   Widget _itemMobile({
+    required int index,
     required String name,
     required String returnT,
     required String params,
     required String content,
   }) {
     final method2 = 'Future<$returnT> $name($params);';
+    final homeCtr = Get.find<HomeController>();
 
     return Column(mainAxisSize: MainAxisSize.min, children: [
       // item
       ListTile(
-        title: FittedBox(
-          child: Text(
-            method2,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+        title: SizedBox(
+          height: 25.0,
+          child: FittedBox(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              method2,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
         ),
         subtitle: Text(
           content,
           style: const TextStyle(color: Colors.grey),
         ),
-        onLongPress: () {},
+        onLongPress: () => homeCtr.deleteMethod(index),
       ),
       // divider
       const Divider(),

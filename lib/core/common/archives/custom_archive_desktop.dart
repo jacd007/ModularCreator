@@ -84,6 +84,50 @@ class CustomArchiveDesktop {
       return false;
     }
   }
+
+  static Future<bool> createZipCustom({
+    required String nameModule,
+    required String contentModule,
+    required String contentModel,
+    required String contentProvider,
+    required String contentRepository,
+    required String contentUseCase,
+  }) async {
+    final name = nameModule.toLowerCase();
+
+    final dirFile1 = '$name/$name';
+    final dir2 = '$name/models/';
+    final dir3 = '$name/provider/';
+    final dir4 = '$name/repositories/';
+    final dir5 = '$name/useCases/';
+
+    // Muestra un diálogo para seleccionar la ruta de descarga
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+
+    if (selectedDirectory != null) {
+      // Definir contenido de los archivos
+      Map<String, String> filesContent = {
+        '${dirFile1}_m.dart': contentModule,
+        '$dir2$name.dart': contentModel,
+        '$dir3${name}_provider.dart': contentProvider,
+        '$dir4${name}_repositories.dart': contentRepository,
+        '$dir5${name}_use_cases.dart': contentUseCase,
+      };
+
+      /// create zip file
+      await createZipFile(
+        filesContent: filesContent,
+        directoryPath: selectedDirectory,
+        fileName: name,
+      );
+
+      debugPrint('ZIP creado y guardado en: $selectedDirectory');
+      return true;
+    } else {
+      debugPrint('No se seleccionó ninguna ruta de descarga');
+      return false;
+    }
+  }
 }
 
 

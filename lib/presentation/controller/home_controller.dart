@@ -43,40 +43,16 @@ class HomeController extends GetxController {
   var errorModel = false.obs;
   final textModelCtr = TextEditingController();
 
-  var listMethods = <MethodsModel>[
-    MethodsModel(
-      name: 'getNameClass',
-      return1: 'ApiResponse',
-      return2: 'List<Object>',
-      params1: '[String idNameClass = ' ']',
-      params2: '[String idNameClass = ' ']',
-      content: 'throw ("Here code");',
-    ),
-    MethodsModel(
-      name: 'postNameClass',
-      return1: 'ApiResponse',
-      return2: 'bool',
-      params1: 'Map<String, dynamic> body',
-      params2: 'Object body',
-      content: 'throw ("Here code");',
-    ),
-    MethodsModel(
-      name: 'putNameClass',
-      return1: 'ApiResponse',
-      return2: 'bool',
-      params1: 'String id, Map<String, dynamic> body',
-      params2: 'String id, Object body',
-      content: 'throw ("Here code");',
-    ),
-    MethodsModel(
-      name: 'deleteNameClass',
-      return1: 'ApiResponse',
-      return2: 'bool',
-      params1: 'String id',
-      params2: 'String id',
-      content: 'throw ("Here code");',
-    ),
-  ].obs;
+  var listMethods = <MethodsModel>[].obs;
+
+  /// text UseCases
+  var textUseCase = ''.obs;
+
+  /// text ProviderUseCases
+  var textProviderUseCase = ''.obs;
+
+  /// text RepositoryUseCases
+  var textRepositoryUseCase = ''.obs;
 
   @override
   void onInit() {
@@ -85,6 +61,8 @@ class HomeController extends GetxController {
   }
 
   void initHome() {
+    // 0
+    _listMethodDefaults();
     // step 1
 
     nameClassCtr.text = nameClass;
@@ -103,11 +81,54 @@ class HomeController extends GetxController {
     update();
   }
 
+  void _listMethodDefaults() {
+    listMethods.value = [
+      MethodsModel(
+        name: 'get$nameClass',
+        return1: 'ApiRestResponse',
+        return2: 'List<Object>',
+        params1: '[String id$nameClass = ""]',
+        params2: '[String id$nameClass = ""]',
+        content: HelperArchiveProvider.jsonContent(nameClass, 'get'),
+        methodTypes: MethodTypes.get,
+      ),
+      MethodsModel(
+        name: 'post$nameClass',
+        return1: 'ApiRestResponse',
+        return2: 'bool',
+        params1: 'Map<String, dynamic> body',
+        params2: 'Object body',
+        content: HelperArchiveProvider.jsonContent(nameClass, 'post'),
+        methodTypes: MethodTypes.post,
+      ),
+      MethodsModel(
+        name: 'put$nameClass',
+        return1: 'ApiRestResponse',
+        return2: 'bool',
+        params1: 'String id, Map<String, dynamic> body',
+        params2: 'String id, Object body',
+        content: HelperArchiveProvider.jsonContent(nameClass, 'put'),
+        methodTypes: MethodTypes.put,
+      ),
+      MethodsModel(
+        name: 'delete$nameClass',
+        return1: 'ApiRestResponse',
+        return2: 'bool',
+        params1: 'String id',
+        params2: 'String id',
+        content: HelperArchiveProvider.jsonContent(nameClass, 'delete'),
+        methodTypes: MethodTypes.delete,
+      ),
+    ];
+    update();
+  }
+
   /// Setter nameClass
   set setNameClass(String value) {
     nameClass = value.trim();
     nameClassCtr.text = value;
     update();
+    _listMethodDefaults();
   }
 
   /// STEP 1 - Name class
@@ -142,7 +163,8 @@ class HomeController extends GetxController {
   /// STEP 3 - Methods list added
   void addMethod({
     required String nameMethod,
-    String returnMethod1 = 'ApiResponse',
+    required MethodTypes methodTypes,
+    String returnMethod1 = 'ApiRestResponse',
     String returnMethod2 = 'Object',
     String params1 = '',
     String params2 = '',
@@ -155,6 +177,7 @@ class HomeController extends GetxController {
       params1: params1,
       params2: params2,
       content: content,
+      methodTypes: methodTypes,
     );
     listMethods.add(map);
     update();
@@ -176,16 +199,29 @@ class HomeController extends GetxController {
     );
   }
 
+  /// STEP 3 - Methods list, update helper
+  void updateStep3() {
+    final date = DateTime.now();
+    final list = listMethods.map((e) => e.toJson()).toList();
+
+    final text = HelperArchiveUseCases.createCustom(nameClass, list);
+    debugPrint('${date.toIso8601String()}, update UseCases step3');
+    textUseCase.value = text;
+
+    final text2 = HelperArchiveProvider.createCustom(nameClass, list);
+    debugPrint('${date.toIso8601String()}, update Provider step3');
+    textProviderUseCase.value = text2;
+
+    final text3 = HelperArchiveRepository.createCustom(nameClass, list);
+    debugPrint('${date.toIso8601String()}, update Repository step3');
+    textRepositoryUseCase.value = text3;
+  }
+
   /// STEP 4 - create file zip
   void onCreateZip() async {
     loading.value = true;
 
     final allCtr = Get.find<AllController>();
-
-    onChanged(
-      nameClass: _convertSnakeToCamel(nameClassCtr.text),
-      content: textModel.value,
-    );
 
     text.value = 'Construyendo ZIP';
     String name = nameClassCtr.text;
@@ -194,9 +230,13 @@ class HomeController extends GetxController {
       throw Exception('Web not supported');
     }
 
-    zip.value = await CustomArchiveDesktop.createZip(
-      nameModule: name,
+    zip.value = await CustomArchiveDesktop.createZipCustom(
+      nameModule: name.toLowerCase(),
+      contentModule: HelperArchiveModule.create(name.toLowerCase()),
       contentModel: textModel.value,
+      contentProvider: textProviderUseCase.value,
+      contentRepository: textRepositoryUseCase.value,
+      contentUseCase: textUseCase.value,
     );
 
     text.value = zip.value ? 'ZIP Creado Correctamente' : 'ZIP no Creado';
@@ -207,7 +247,11 @@ class HomeController extends GetxController {
     loading.value = false;
     if (zip.value) {
       nameClassCtr.clear();
-      allCtr.pageCtr.jumpTo(0.0);
+      allCtr.onPagePrevious();
+      allCtr.onPagePrevious();
+      allCtr.onPagePrevious();
+      allCtr.onPagePrevious();
+      allCtr.onPagePrevious();
       update();
     }
   }
@@ -223,6 +267,11 @@ class HomeController extends GetxController {
     String middleChars = input.substring(1, input.length - 1);
 
     return '$firstChar$middleChars$lastChar';
+  }
+
+  void deleteMethod(int index) {
+    listMethods.removeAt(index);
+    update();
   }
 }//** **/
 

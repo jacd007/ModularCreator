@@ -1,3 +1,12 @@
+enum MethodTypes {
+  get,
+  post,
+  put,
+  delete,
+  head,
+  patch,
+}
+
 class MethodsModel {
   String name;
   String return1;
@@ -5,6 +14,7 @@ class MethodsModel {
   String params1;
   String params2;
   String content;
+  MethodTypes methodTypes;
 
   /// Constructor
   MethodsModel({
@@ -14,6 +24,7 @@ class MethodsModel {
     required this.params1,
     required this.params2,
     required this.content,
+    required this.methodTypes,
   });
 
   /// Copy with Method
@@ -24,6 +35,7 @@ class MethodsModel {
     String? params1,
     String? params2,
     String? content,
+    MethodTypes? methodTypes,
   }) {
     return MethodsModel(
       name: name ?? this.name,
@@ -32,6 +44,7 @@ class MethodsModel {
       params1: params1 ?? this.params1,
       params2: params2 ?? this.params2,
       content: content ?? this.content,
+      methodTypes: methodTypes ?? this.methodTypes,
     );
   }
 
@@ -44,6 +57,7 @@ class MethodsModel {
       params1: json['params1'] ?? '',
       params2: json['params2'] ?? '',
       content: json['content'] ?? '',
+      methodTypes: MethodTypes.values[json["methodTypes"] ?? ''],
     );
   }
 
@@ -56,6 +70,7 @@ class MethodsModel {
       'params1': params1,
       'params2': params2,
       'content': content,
+      'methodTypes': methodTypes.index,
     };
   }
 
@@ -67,6 +82,7 @@ class MethodsModel {
     String params1 = '',
     String params2 = '',
     String content = '',
+    MethodTypes methodTypes = MethodTypes.get,
   }) {
     return MethodsModel(
       name: name,
@@ -75,6 +91,7 @@ class MethodsModel {
       params1: params1,
       params2: params2,
       content: content,
+      methodTypes: methodTypes,
     );
   }
 }

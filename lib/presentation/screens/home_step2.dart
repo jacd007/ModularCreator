@@ -24,6 +24,7 @@ class HomeStep2Screen extends StatelessWidget {
                     flex: 1,
                     child: ExpansionTile(
                       title: const Text('Json Input'),
+                      initiallyExpanded: true,
                       children: [_jsonInput(homeCtr, maxPercentHeight: 0.80)],
                     ),
                   ),
@@ -32,6 +33,7 @@ class HomeStep2Screen extends StatelessWidget {
                     flex: 2,
                     child: ExpansionTile(
                       title: const Text('Json Output'),
+                      initiallyExpanded: true,
                       children: [_jsonOutput(homeCtr, maxPercentHeight: 0.80)],
                     ),
                   ),

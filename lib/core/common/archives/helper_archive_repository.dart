@@ -1,6 +1,67 @@
 class HelperArchiveRepository {
   HelperArchiveRepository._();
 
+  static String jsonContent(String name, Map<String, dynamic> json) {
+    StringBuffer sb = StringBuffer();
+
+    // ignore: unused_local_variable
+    final nameLower = name.toLowerCase();
+    final nameMethod = json["name"] ?? '';
+    final params1 = json["params2"] ?? '';
+
+    sb.writeln("    final response = await _provider.$nameMethod($params1);");
+    sb.writeln("    /// ERROR request");
+    sb.writeln("    if (!response.status) {");
+    sb.writeln("      // TODO: implement get$name");
+    sb.writeln("      return throw('Error');");
+    sb.writeln("    }");
+    sb.writeln("    final collection = response.parseResponse ;");
+    sb.writeln("    return collection;");
+
+    return sb.toString();
+  }
+
+  /// * Example:
+  /// ```
+  /// {
+  ///   'name': name,
+  ///   'return1': return1,
+  ///   'return2': return2,
+  ///   'params1': params1,
+  ///   'params2': params2,
+  ///   'content': content,
+  /// }
+  /// ```
+  static String createCustom(
+    String name,
+    List<Map<String, dynamic>> listMethods,
+  ) {
+    StringBuffer sb = StringBuffer();
+
+    sb.writeln("\n");
+    sb.writeln("import 'package:flutter/material.dart';");
+    sb.writeln("\n");
+    sb.writeln("import '../${name.toLowerCase()}_m.dart';");
+    sb.writeln("\n");
+    sb.writeln("class ${name}Repositories extends ${name}RepositoryUseCases {");
+    sb.writeln("  final _provider = ${name}Provider();");
+
+    sb.writeln("\n");
+
+    sb.writeln("  @override");
+    for (var json in listMethods) {
+      sb.writeln(
+          "  Future<List<${name}Model>> get$name([String id = " "]) async {");
+      sb.writeln(jsonContent(name, json));
+      sb.writeln("    }");
+    }
+
+    sb.writeln("  }");
+    sb.writeln("\n");
+
+    return sb.toString();
+  }
+
   ///
   static String create(String name) {
     return '''
