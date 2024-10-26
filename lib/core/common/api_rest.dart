@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -14,6 +16,30 @@ enum ApiMethod {
   patch,
 }
 
+/// Here is a succinct explanation of the ApiRest class definition:
+///
+/// Class Overview
+///
+/// The ApiRest class is a utility class for making HTTP requests to a REST
+/// API.
+///
+/// It provides a simple way to send GET, POST, PUT, DELETE, and HEAD requests
+/// to a specified URL with optional headers, query parameters, and body data.
+///
+/// Class Methods
+///
+/// * request<T>: Sends an HTTP request to the specified URL with optional
+/// body data and headers. Returns a Future containing an ApiRestResponse
+/// object with the response code, status, and parsed response body.
+/// * requestRead: Sends a GET request to the specified URL and returns the
+/// response body as a string.
+/// * requestReadBytes: Sends a GET request to the specified URL and returns
+/// the response body as a byte array.
+///
+/// Note that the request method is the main method of the class, and it uses
+/// a switch statement to determine which HTTP method to use based on the
+/// method property of the class. The requestRead and requestReadBytes
+/// methods are simpler and only send GET requests.
 class ApiRest {
   /// [urlBase] String Url base to request
   /// * Example: https://api.projectname.com
@@ -82,10 +108,13 @@ class ApiRest {
 
   /// Method Get
   Future<ApiRestResponse<T>> request<T>(
-      {Map<String, dynamic>? body, bool bodyIsJson = false}) async {
+      {Object? body, bool bodyIsJson = false}) async {
     ///
     /// Check body no null
-    if (method != ApiMethod.get && method != ApiMethod.head && body == null) {
+    if ((method != ApiMethod.get) &&
+        (method != ApiMethod.head) &&
+        (method != ApiMethod.delete) &&
+        (body == null)) {
       throw UnimplementedError(
         'ApiMethod ${method.name.toUpperCase()} required `Object?` body',
       );
@@ -105,46 +134,143 @@ class ApiRest {
 
     /// Check queryParameters
     if (queryParameters != null) {
-      path = "$path?${Uri(queryParameters: queryParameters).query}";
+      final query = ApiService2.queryFromJson(queryParameters!);
+      path = "$path$query";
     }
 
     /// url
     Uri uri = Uri.parse('$urlBase$path');
 
+    String def = '';
+    try {
+      def = jsonEncode({"code": 404, "status": false});
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+
     /// initialization
-    late http.Response response;
+    http.Response response = http.Response(def, 404);
 
     /// check method
     switch (method) {
       case ApiMethod.get:
-        response = await http.get(
-          uri,
-          headers: headers,
-        );
+        try {
+          response = await http.get(
+            uri,
+            headers: headers,
+          );
+        } catch (e) {
+          debugPrint(e.toString());
+        }
         break;
       case ApiMethod.post:
-        response = await http.post(
-          uri,
-          body: bodyIsJson ? body : jsonEncode(body),
-          headers: headers,
-          encoding: encoding,
-        );
+        try {
+          final resp = await ApiService2.post(
+            url: uri,
+            body: body,
+            header: headers,
+          );
+          if (resp != null) {
+            response = resp;
+          } else {
+            response = await http.post(
+              uri,
+              body: bodyIsJson ? body : jsonEncode(body),
+              headers: headers,
+              encoding: encoding,
+            );
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+          response = await http.post(
+            uri,
+            body: bodyIsJson ? body : jsonEncode(body),
+            headers: headers,
+            encoding: encoding,
+          );
+        }
+
         break;
       case ApiMethod.put:
-        response = await http.put(
-          uri,
-          body: bodyIsJson ? body : jsonEncode(body),
-          headers: headers,
-          encoding: encoding,
-        );
+        try {
+          final resp = await ApiService2.put(
+            url: uri,
+            body: body,
+            header: headers,
+          );
+          if (resp != null) {
+            response = resp;
+          } else {
+            response = await http.put(
+              uri,
+              body: bodyIsJson ? body : jsonEncode(body),
+              headers: headers,
+              encoding: encoding,
+            );
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+          response = await http.put(
+            uri,
+            body: bodyIsJson ? body : jsonEncode(body),
+            headers: headers,
+            encoding: encoding,
+          );
+        }
         break;
       case ApiMethod.delete:
-        response = await http.delete(
-          uri,
-          body: bodyIsJson ? body : jsonEncode(body),
-          headers: headers,
-          encoding: encoding,
-        );
+        try {
+          final resp = await ApiService2.delete(
+            url: uri,
+            header: headers,
+          );
+          if (resp != null) {
+            response = resp;
+          } else {
+            response = await http.delete(
+              uri,
+              body: bodyIsJson ? body : jsonEncode(body),
+              headers: headers,
+              encoding: encoding,
+            );
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+          response = await http.delete(
+            uri,
+            body: bodyIsJson ? body : jsonEncode(body),
+            headers: headers,
+            encoding: encoding,
+          );
+        }
+        break;
+      case ApiMethod.patch:
+        try {
+          final resp = await ApiService2.patch(
+            url: uri,
+            body: body,
+            header: headers,
+          );
+          if (resp != null) {
+            response = resp;
+          } else {
+            response = await http.patch(
+              uri,
+              body: bodyIsJson ? body : jsonEncode(body),
+              headers: headers,
+              encoding: encoding,
+            );
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+          response = await http.post(
+            uri,
+            body: bodyIsJson ? body : jsonEncode(body),
+            headers: headers,
+            encoding: encoding,
+          );
+        }
+
         break;
       case ApiMethod.head:
         response = await http.head(
@@ -172,18 +298,24 @@ class ApiRest {
     } on Exception catch (_) {}
 
     if (debugMode) {
+      debugPrint('*' * 40);
       debugPrint('- Timestamp: ${DateTime.now()}');
       debugPrint('- Url: $uri');
       debugPrint('- Method: ${method.name.toUpperCase()}');
+      if (headers != null) debugPrint('- Headers: ${jsonEncode(headers)}');
       debugPrint('- Code Status: $code');
+      if (body != null) debugPrint('- body: $body');
       debugPrint('- Response: $respObject');
+      debugPrint('*' * 40);
+    } else {
+      debugPrint('ApiRest - Response ${status ? 'SUCCESS' : 'FAIL'} => $uri');
     }
 
     return ApiRestResponse(
       code: code,
       status: status,
       response: response,
-      respObject: respObject,
+      parseResponse: respObject,
     );
   }
 
@@ -247,10 +379,11 @@ class ApiRestOptions {
   /// * Authorization: [token]
   ///
   static Map<String, String> headersAuth(String token,
-      {Map<String, String>? allHeaders}) {
+      {String headerAuthorization = 'Authorization',
+      Map<String, String>? allHeaders}) {
     final map = {
       'Content-Type': 'application/json; charset=UTF-8',
-      "Authorization": token,
+      headerAuthorization: token,
     };
 
     if (allHeaders != null) {
@@ -307,13 +440,13 @@ class ApiRestResponse<T> {
   final http.Response response;
 
   /// Parse [dynamic] response request
-  final T? respObject;
+  final T? parseResponse;
 
   ApiRestResponse({
     required this.code,
     required this.response,
     this.status = false,
-    this.respObject,
+    this.parseResponse,
   });
 
   ApiRestResponse<T> copyWith({
@@ -326,7 +459,7 @@ class ApiRestResponse<T> {
         code: code ?? this.code,
         status: status ?? this.status,
         response: response ?? this.response,
-        respObject: respObject ?? this.respObject,
+        parseResponse: respObject ?? this.parseResponse,
       );
 
   static ApiRestResponse<T> empty<T>({
@@ -339,7 +472,226 @@ class ApiRestResponse<T> {
       code: code,
       status: status,
       response: response ?? http.Response('', 404),
-      respObject: respObject,
+      parseResponse: respObject,
     );
+  }
+}
+
+// ============================================================
+
+class ApiService2 {
+  //---- HEADERs
+
+  static final HEADERS_SIMPLE = {
+    'Content-Type': 'application/json; charset=UTF-8',
+  };
+
+  static final HEADERS_FORM_DATA = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+
+  static Map<String, String> HEADERS_AUTH(String token) {
+    return {
+      'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": token,
+    };
+  }
+
+  static String basicAuth(
+      {required String username, required String password}) {
+    String basicAuth =
+        'Basic ${base64.encode(utf8.encode('$username:$password'))}';
+    return basicAuth;
+  }
+
+  //----- Query's
+  static String queryFromJson(Map<String, dynamic> json) {
+    String query = '';
+    var keys = json.keys;
+    var values = json.values;
+    for (int i = 0; i < keys.length; i++) {
+      if (i == 0) query += '?${keys.first}=${values.first}';
+      if (i != 0) query += '&${keys.elementAt(i)}=${values.elementAt(i)}';
+    }
+    return query;
+  }
+
+  //---- URL
+  static Uri getUrl({required url, required endpoint, dynamic params}) =>
+      params != null
+          ? Uri.https(url, endpoint, params)
+          : Uri.https(url, endpoint);
+  //--------
+  static getBody(http.Response response) {
+    String b = utf8.decode(response.bodyBytes);
+    final json = jsonDecode(b);
+    return json;
+  }
+
+  static Future<Uint8List> getResponse(String path) async {
+    final url = Uri.parse(path);
+    final response = await http.get(url);
+    return response.bodyBytes;
+  }
+
+  /// GET
+  static Future<http.Response?> get({
+    required Uri url,
+    bool printResp = false,
+    bool printUrl = true,
+    Map<String, String>? header,
+    int timeOut = 80,
+  }) async {
+    try {
+      var response = await http
+          .get(
+            url,
+            headers: header ?? HEADERS_SIMPLE,
+          )
+          .timeout(Duration(seconds: timeOut));
+      if (printUrl) {
+        debugPrint(
+            'Response GET status: ${response.statusCode} || ${url.path}');
+      }
+      if (printResp) debugPrint('Response body: ${response.body}');
+      return response;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// POST
+  static Future<http.Response?> post({
+    required Uri url,
+    required body,
+    bool printResp = false,
+    Map<String, String>? header,
+    int timeOut = 80,
+    bool isFormData = false,
+  }) async {
+    try {
+      var response = await http
+          .post(
+            url,
+            body: isFormData ? body : jsonEncode(body),
+            headers: header ?? HEADERS_SIMPLE,
+          )
+          .timeout(Duration(seconds: timeOut));
+      debugPrint(
+          'Response POST status: ${response.statusCode}  || ${url.path}');
+      if (printResp) debugPrint('Response body: ${response.body}');
+      return response;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// PUT
+  static Future<http.Response?> put({
+    required Uri url,
+    required body,
+    bool printResp = false,
+    Map<String, String>? header,
+    int timeOut = 80,
+    bool isFormData = false,
+  }) async {
+    try {
+      var response = await http
+          .put(
+            url,
+            body: isFormData ? body : jsonEncode(body),
+            headers: header ?? HEADERS_SIMPLE,
+          )
+          .timeout(Duration(seconds: timeOut));
+      debugPrint('Response PUT status: ${response.statusCode}  || ${url.path}');
+      if (printResp) debugPrint('Response body: ${response.body}');
+      return response;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// DELETE
+  static Future<http.Response?> delete({
+    required Uri url,
+    bool printResp = false,
+    Map<String, String>? header,
+    int timeout = 300,
+  }) async {
+    try {
+      var response = await http
+          .delete(
+            url,
+            headers: header ?? HEADERS_SIMPLE,
+          )
+          .timeout(Duration(seconds: timeout));
+      debugPrint(
+          'Response DELETE status: ${response.statusCode} || ${url.path}');
+      if (printResp) debugPrint('Response body: ${response.body}');
+      return response;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// PATCH
+  static Future<http.Response?> patch({
+    required Uri url,
+    required body,
+    bool printResp = false,
+    Map<String, String>? header,
+    int timeOut = 80,
+    bool isFormData = false,
+  }) async {
+    try {
+      var response = await http
+          .patch(
+            url,
+            body: isFormData ? body : jsonEncode(body),
+            headers: header ?? HEADERS_SIMPLE,
+          )
+          .timeout(Duration(seconds: timeOut));
+      debugPrint('Response PUT status: ${response.statusCode}  || ${url.path}');
+      if (printResp) debugPrint('Response body: ${response.body}');
+      return response;
+    } catch (_) {
+      return null;
+    }
+  }
+
+// notification push services
+  static Future<void> sendMessageFirebaseCloud(
+      {required String tokenSend,
+      required String authorization,
+      String title = '',
+      String content = '',
+      Map<String, dynamic>? data,
+      bool printResp = false,
+      int timeOut = 300}) async {
+    // header
+    Map<String, String> headersAuth = {
+      "Authorization": authorization,
+      "Content-Type": 'application/json',
+    };
+
+    // body send
+    Map<String, dynamic> body = {
+      "to": tokenSend,
+      "notification": {"title": title, "body": content},
+      "data": data ?? {}
+    };
+
+    try {
+      var url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+      var response = await http
+          .post(
+            url,
+            body: jsonEncode(body),
+            headers: headersAuth,
+          )
+          .timeout(Duration(seconds: timeOut));
+      debugPrint('Response status: ${response.statusCode}');
+      if (printResp) debugPrint('Response body: ${response.body}');
+    } catch (_) {}
   }
 }

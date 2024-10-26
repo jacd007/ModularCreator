@@ -86,7 +86,7 @@ class HomeController extends GetxController {
       MethodsModel(
         name: 'get$nameClass',
         return1: 'ApiRestResponse',
-        return2: 'List<Object>',
+        return2: 'List<${nameClass}Model>',
         params1: '[String id$nameClass = ""]',
         params2: '[String id$nameClass = ""]',
         content: HelperArchiveProvider.jsonContent(nameClass, 'get'),
@@ -97,7 +97,7 @@ class HomeController extends GetxController {
         return1: 'ApiRestResponse',
         return2: 'bool',
         params1: 'Map<String, dynamic> body',
-        params2: 'Object body',
+        params2: '${nameClass}Model body',
         content: HelperArchiveProvider.jsonContent(nameClass, 'post'),
         methodTypes: MethodTypes.post,
       ),
@@ -106,7 +106,7 @@ class HomeController extends GetxController {
         return1: 'ApiRestResponse',
         return2: 'bool',
         params1: 'String id, Map<String, dynamic> body',
-        params2: 'String id, Object body',
+        params2: 'String id, ${nameClass}Model body',
         content: HelperArchiveProvider.jsonContent(nameClass, 'put'),
         methodTypes: MethodTypes.put,
       ),
@@ -247,26 +247,10 @@ class HomeController extends GetxController {
     loading.value = false;
     if (zip.value) {
       nameClassCtr.clear();
-      allCtr.onPagePrevious();
-      allCtr.onPagePrevious();
-      allCtr.onPagePrevious();
-      allCtr.onPagePrevious();
-      allCtr.onPagePrevious();
+      allCtr.currentPage = 0;
+      allCtr.pageCtr.jumpToPage(0);
       update();
     }
-  }
-
-  String _convertSnakeToCamel(String input) {
-    if (input.isEmpty) return '';
-
-    input = input.contains(" ") ? input.replaceAll(" ", "_") : input;
-    // input = input.contains("_") ? input.replaceAll("_", "") : input;
-
-    String firstChar = input[0].toUpperCase();
-    String lastChar = input[input.length - 1].toLowerCase();
-    String middleChars = input.substring(1, input.length - 1);
-
-    return '$firstChar$middleChars$lastChar';
   }
 
   void deleteMethod(int index) {

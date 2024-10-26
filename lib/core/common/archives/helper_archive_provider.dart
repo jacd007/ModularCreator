@@ -2,23 +2,23 @@ class HelperArchiveProvider {
   HelperArchiveProvider._();
 
   static String jsonContent(String name, [String method = 'get']) {
-    final nameLower = name.toLowerCase();
-
-    String body = method == 'post' || method == 'put' || method == 'patch'
-        ? 'body: body'
-        : '';
-
     StringBuffer sb = StringBuffer();
-    sb.writeln("   final token = await SharedPrefs.getString(shared_JWT);");
     sb.writeln("\n");
-    sb.writeln("   _apiRest");
-    sb.writeln("      ..endpoint = '\${Endpoint.$nameLower}/\$id$name'");
-    sb.writeln("      ..headers = ApiRestOptions.headersAuth('Token \$token')");
-    sb.writeln("      ..debugMode = false");
-    sb.writeln("      ..method = ApiMethod.$method;");
+    sb.writeln("//    final token = await SharedPrefs.getString(shared_JWT);");
     sb.writeln("\n");
-    sb.writeln("   final response = await _apiRest.request($body);");
-    sb.writeln("return response;");
+    sb.writeln("//    _apiRest");
+    sb.writeln("//      ..endpoint = Endpoint.\${name.toLowerCase()}");
+    sb.writeln(
+        "//      ..headers = ApiRestOptions.headersAuth('Token \$token')");
+    sb.writeln("//      ..debugMode = false");
+    sb.writeln("//      ..method = ApiMethod.$method;");
+    sb.writeln("\n");
+    sb.writeln("//    final response = await _apiRest.request();");
+    sb.writeln("//    return response;");
+    sb.writeln("// TODO: implement getOffers");
+    sb.writeln("throw UnimplementedError();");
+    sb.writeln("\n");
+
     final content = sb.toString();
     return content;
   }
@@ -32,6 +32,7 @@ class HelperArchiveProvider {
   ///   'params1': params1,
   ///   'params2': params2,
   ///   'content': content,
+  ///   'methodTypes': methodTypes.index,
   /// }
   /// ```
   static String createCustom(

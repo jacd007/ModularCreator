@@ -9,6 +9,9 @@ class HelperArchiveRepository {
     final nameMethod = json["name"] ?? '';
     final params1 = json["params2"] ?? '';
 
+    sb.writeln("final json = body.toJson();");
+    sb.writeln("\n");
+
     sb.writeln("    final response = await _provider.$nameMethod($params1);");
     sb.writeln("    /// ERROR request");
     sb.writeln("    if (!response.status) {");
@@ -30,6 +33,7 @@ class HelperArchiveRepository {
   ///   'params1': params1,
   ///   'params2': params2,
   ///   'content': content,
+  ///   'methodTypes': methodTypes.index,
   /// }
   /// ```
   static String createCustom(
@@ -48,11 +52,18 @@ class HelperArchiveRepository {
 
     sb.writeln("\n");
 
-    sb.writeln("  @override");
     for (var json in listMethods) {
+      final nameMethod = json["name"] ?? '';
+      final return1 = json["return2"] ?? 'void';
+      final params1 = json["params2"] ?? '';
+      final content = json["content"] ?? jsonContent(name, json);
+
+      sb.writeln("  @override");
+      sb.writeln("  Future<$return1> $nameMethod($params1) async {");
+      sb.writeln("// final resp = await _provider.$nameMethod();");
       sb.writeln(
-          "  Future<List<${name}Model>> get$name([String id = " "]) async {");
-      sb.writeln(jsonContent(name, json));
+          "// debugPrint('Repositories - $nameMethod: \${resp.parseResponse}');");
+      sb.writeln(content);
       sb.writeln("    }");
     }
 
