@@ -89,7 +89,8 @@ class HomeController extends GetxController {
         return2: 'List<${nameClass}Model>',
         params1: '[String id$nameClass = ""]',
         params2: '[String id$nameClass = ""]',
-        content: HelperArchiveProvider.jsonContent(nameClass, 'get'),
+        content1: HelperArchiveProvider.jsonContent(nameClass, 'get'),
+        content2: HelperArchiveRepository.jsonContent(nameClass),
         methodTypes: MethodTypes.get,
       ),
       MethodsModel(
@@ -98,7 +99,8 @@ class HomeController extends GetxController {
         return2: 'bool',
         params1: 'Map<String, dynamic> body',
         params2: '${nameClass}Model body',
-        content: HelperArchiveProvider.jsonContent(nameClass, 'post'),
+        content1: HelperArchiveProvider.jsonContent(nameClass, 'post'),
+        content2: HelperArchiveRepository.jsonContent(nameClass),
         methodTypes: MethodTypes.post,
       ),
       MethodsModel(
@@ -107,7 +109,8 @@ class HomeController extends GetxController {
         return2: 'bool',
         params1: 'String id, Map<String, dynamic> body',
         params2: 'String id, ${nameClass}Model body',
-        content: HelperArchiveProvider.jsonContent(nameClass, 'put'),
+        content1: HelperArchiveProvider.jsonContent(nameClass, 'put'),
+        content2: HelperArchiveRepository.jsonContent(nameClass),
         methodTypes: MethodTypes.put,
       ),
       MethodsModel(
@@ -116,7 +119,8 @@ class HomeController extends GetxController {
         return2: 'bool',
         params1: 'String id',
         params2: 'String id',
-        content: HelperArchiveProvider.jsonContent(nameClass, 'delete'),
+        content1: HelperArchiveProvider.jsonContent(nameClass, 'delete'),
+        content2: HelperArchiveRepository.jsonContent(nameClass),
         methodTypes: MethodTypes.delete,
       ),
     ];
@@ -169,6 +173,7 @@ class HomeController extends GetxController {
     String params1 = '',
     String params2 = '',
     String content = 'throw ("Here code");',
+    String content2 = 'throw ("Here code");',
   }) {
     final map = MethodsModel(
       name: nameMethod,
@@ -176,7 +181,8 @@ class HomeController extends GetxController {
       return2: returnMethod1,
       params1: params1,
       params2: params2,
-      content: content,
+      content1: content,
+      content2: content2,
       methodTypes: methodTypes,
     );
     listMethods.add(map);

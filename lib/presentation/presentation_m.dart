@@ -3,6 +3,7 @@ export 'package:get/get.dart';
 export 'controller/all_controller.dart';
 export 'controller/home_controller.dart';
 
+export 'pages/home_main.dart';
 export 'pages/home_steps.dart';
 export 'pages/home.dart';
 

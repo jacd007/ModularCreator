@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
     return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
       // home: HomePage(),
-      home: HomeStepsPage(),
+      // home: HomeStepsPage(),
+      home: HomeMainPage(),
     );
   }
 }

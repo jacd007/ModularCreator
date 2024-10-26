@@ -106,6 +106,8 @@ class _AddMethodDialogState extends State<AddMethodDialog> {
       width: 200.0,
       child: ElevatedButton(
         onPressed: () {
+          final name = homeCtr.nameClass;
+
           if (ctrName.text.trim().isEmpty) return;
           if (ctrReturn1.text.trim().isEmpty) return;
           if (ctrContent.text.trim().isEmpty) return;
@@ -116,7 +118,8 @@ class _AddMethodDialogState extends State<AddMethodDialog> {
             return2: ctrReturn1.text.trim(),
             params1: ctrParams.text.trim(),
             params2: ctrParams.text.trim(),
-            content: ctrContent.text.trim(),
+            content1: ctrContent.text.trim(),
+            content2: HelperArchiveRepository.jsonContent(name),
             methodTypes: methodType,
           );
           widget.onConfirm.call(method);

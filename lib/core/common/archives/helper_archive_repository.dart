@@ -1,25 +1,11 @@
 class HelperArchiveRepository {
   HelperArchiveRepository._();
 
-  static String jsonContent(String name, Map<String, dynamic> json) {
+  static String jsonContent(String name) {
     StringBuffer sb = StringBuffer();
 
-    // ignore: unused_local_variable
-    final nameLower = name.toLowerCase();
-    final nameMethod = json["name"] ?? '';
-    final params1 = json["params2"] ?? '';
-
-    sb.writeln("final json = body.toJson();");
-    sb.writeln("\n");
-
-    sb.writeln("    final response = await _provider.$nameMethod($params1);");
-    sb.writeln("    /// ERROR request");
-    sb.writeln("    if (!response.status) {");
-    sb.writeln("      // TODO: implement get$name");
-    sb.writeln("      return throw('Error');");
-    sb.writeln("    }");
-    sb.writeln("    final collection = response.parseResponse ;");
-    sb.writeln("    return collection;");
+    sb.writeln("// TODO: implement $name");
+    sb.writeln(" throw UnimplementedError();");
 
     return sb.toString();
   }
@@ -56,7 +42,7 @@ class HelperArchiveRepository {
       final nameMethod = json["name"] ?? '';
       final return1 = json["return2"] ?? 'void';
       final params1 = json["params2"] ?? '';
-      final content = json["content"] ?? jsonContent(name, json);
+      final content = json["content2"] ?? jsonContent(name);
 
       sb.writeln("  @override");
       sb.writeln("  Future<$return1> $nameMethod($params1) async {");

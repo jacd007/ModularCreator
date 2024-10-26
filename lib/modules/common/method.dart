@@ -13,7 +13,8 @@ class MethodsModel {
   String return2;
   String params1;
   String params2;
-  String content;
+  String content1;
+  String content2;
   MethodTypes methodTypes;
 
   /// Constructor
@@ -23,7 +24,8 @@ class MethodsModel {
     required this.return2,
     required this.params1,
     required this.params2,
-    required this.content,
+    required this.content1,
+    required this.content2,
     required this.methodTypes,
   });
 
@@ -34,7 +36,8 @@ class MethodsModel {
     String? return2,
     String? params1,
     String? params2,
-    String? content,
+    String? content1,
+    String? content2,
     MethodTypes? methodTypes,
   }) {
     return MethodsModel(
@@ -43,7 +46,8 @@ class MethodsModel {
       return2: return2 ?? this.return2,
       params1: params1 ?? this.params1,
       params2: params2 ?? this.params2,
-      content: content ?? this.content,
+      content1: content1 ?? this.content1,
+      content2: content2 ?? this.content2,
       methodTypes: methodTypes ?? this.methodTypes,
     );
   }
@@ -56,7 +60,8 @@ class MethodsModel {
       return2: json['return2'] ?? '',
       params1: json['params1'] ?? '',
       params2: json['params2'] ?? '',
-      content: json['content'] ?? '',
+      content1: json['content'] ?? '',
+      content2: json['content2'] ?? '',
       methodTypes: MethodTypes.values[json["methodTypes"] ?? ''],
     );
   }
@@ -69,7 +74,8 @@ class MethodsModel {
       'return2': return2,
       'params1': params1,
       'params2': params2,
-      'content': content,
+      'content': content1,
+      'content2': content2,
       'methodTypes': methodTypes.index,
     };
   }
@@ -81,7 +87,8 @@ class MethodsModel {
     String retorno2 = '',
     String params1 = '',
     String params2 = '',
-    String content = '',
+    String content1 = '',
+    String content2 = '',
     MethodTypes methodTypes = MethodTypes.get,
   }) {
     return MethodsModel(
@@ -90,7 +97,8 @@ class MethodsModel {
       return2: retorno2,
       params1: params1,
       params2: params2,
-      content: content,
+      content1: content1,
+      content2: content2,
       methodTypes: methodTypes,
     );
   }

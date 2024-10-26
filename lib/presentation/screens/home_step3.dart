@@ -29,14 +29,14 @@ class HomeStep3Screen extends StatelessWidget {
                     name: homeCtr.listMethods[i].name,
                     returnT: homeCtr.listMethods[i].return1,
                     params: homeCtr.listMethods[i].params1,
-                    content: homeCtr.listMethods[i].content,
+                    content: homeCtr.listMethods[i].content1,
                   ),
                   mobileScreen: _itemMobile(
                     index: i,
                     name: homeCtr.listMethods[i].name,
                     returnT: homeCtr.listMethods[i].return1,
                     params: homeCtr.listMethods[i].params1,
-                    content: homeCtr.listMethods[i].content,
+                    content: homeCtr.listMethods[i].content1,
                   ),
                 ),
               // title useCase repositories

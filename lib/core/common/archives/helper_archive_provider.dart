@@ -4,19 +4,18 @@ class HelperArchiveProvider {
   static String jsonContent(String name, [String method = 'get']) {
     StringBuffer sb = StringBuffer();
     sb.writeln("\n");
-    sb.writeln("//    final token = await SharedPrefs.getString(shared_JWT);");
+    sb.writeln("    final token = await SharedPrefs.getString(shared_JWT);");
     sb.writeln("\n");
-    sb.writeln("//    _apiRest");
-    sb.writeln("//      ..endpoint = Endpoint.\${name.toLowerCase()}");
-    sb.writeln(
-        "//      ..headers = ApiRestOptions.headersAuth('Token \$token')");
-    sb.writeln("//      ..debugMode = false");
-    sb.writeln("//      ..method = ApiMethod.$method;");
+    sb.writeln("    _apiRest");
+    sb.writeln("      ..endpoint = Endpoint.${name.toLowerCase()}");
+    sb.writeln("      ..headers = ApiRestOptions.headersAuth('Token \$token')");
+    sb.writeln("      ..debugMode = false");
+    sb.writeln("      ..method = ApiMethod.$method;");
     sb.writeln("\n");
-    sb.writeln("//    final response = await _apiRest.request();");
-    sb.writeln("//    return response;");
+    sb.writeln("    final response = await _apiRest.request();");
+    sb.writeln("    return response;");
     sb.writeln("// TODO: implement getOffers");
-    sb.writeln("throw UnimplementedError();");
+    sb.writeln("// throw UnimplementedError();");
     sb.writeln("\n");
 
     final content = sb.toString();
